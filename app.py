@@ -5,6 +5,7 @@ os.environ['PATH'] = os.environ['PATH'] + ':/usr/local/cuda/bin'
 from datetime import datetime
 
 import gradio as gr
+import gradio_client.utils as gutils
 import numpy as np
 import torch
 from diffusers.image_processor import VaeImageProcessor
@@ -210,6 +211,23 @@ HEADER = """
 · This demo will show underwear but will not display nudity.
 · Use responsibly
 """
+if hasattr(gutils, "get_type"):
+    _old_get_type = gutils.get_type
+    def _safe_get_type(schema):
+        if not isinstance(schema, dict):
+            return "Unknown"
+        return _old_get_type(schema)
+    gutils.get_type = _safe_get_type
+
+if hasattr(gutils, "_json_schema_to_python_type"):
+    _old_json_schema_to_python_type = gutils._json_schema_to_python_type
+    def _safe_json_schema_to_python_type(schema, defs=None):
+        # prevent crashes when schema is bool or None
+        if not isinstance(schema, dict):
+            return "Unknown"
+        return _old_json_schema_to_python_type(schema, defs)
+    gutils._json_schema_to_python_type = _safe_json_schema_to_python_type
+
 
 def app_gradio():
     with gr.Blocks(title="VTON") as demo:
