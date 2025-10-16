@@ -203,7 +203,7 @@ class CatVTONPipeline:
         image = numpy_to_pil(image)
         
         # Safety Check
-        if not self.skip_safety_check:
+        if self.skip_safety_check:
             current_script_directory = os.path.dirname(os.path.realpath(__file__))
             nsfw_image = os.path.join(os.path.dirname(current_script_directory), 'resource', 'img', 'NSFW.jpg')
             nsfw_image = PIL.Image.open(nsfw_image).resize(image[0].size)
